@@ -16,10 +16,7 @@ class Reporter(object):
                         })
     """
 
-    def __init__(self, database=None):
-        if not database:
-            database = "reporter.db"
-
+    def __init__(self, database="reporter.db"):
         self.database   = database
         self.connection = sqlite3.connect(self.database)
         self.cursor     = self.connection.cursor()
@@ -46,22 +43,17 @@ class Reporter(object):
             create_str += "\n      ,{} {}".format(str(k), d[type(v)] )
         create_str += ")"
 
-        #print( create_str )
         self.cursor.execute( create_str )
         self.connection.commit()
         self.table_created = True
 
     def write(self, values ):
         if not self.table_created:
-            print("No table found?")
             self._create_table(values)
 
         columns = ", ".join(values.keys())
-        #columns += ", date"
         placeholders = ":"+", :".join(values.keys())
-        #placeholders += ", :", datetime.now()
         query = """INSERT INTO {} (d1, {}) VALUES (strftime('%s', 'now'), {})""".format(TABLENAME, columns, placeholders)
-        #print( query )
         self.cursor.execute(query, values)
         self.connection.commit()
 
