@@ -34,7 +34,7 @@ class Reporter(object):
             return False
 
     def _create_table(self, values):
-        d = { str: "TEXT", float: "FLOAT", int: "INTEGER" }
+        d = { str: "TEXT", float: "FLOAT", int: "INTEGER", bool: "BOOL" }
         create_str = """create table if not exists {}(
             id INTEGER PRIMARY KEY
             ,d1 INT  -- Date Stored in unixtime (seconds since 1st.Jan.1970) 
@@ -57,12 +57,16 @@ class Reporter(object):
         self.cursor.execute(query, values)
         self.connection.commit()
 
+    def __del__(self):
+        self.cursor.close()
+        self.connection.close()
+
 if __name__ == "__main__":
     reporter = Reporter()
     reporter.write({
         "description": "new loss function",
         "epoch"      : 2,
-        "score"      : 4.0
+        "score"      : 4.0,
+        "us_augment" : True
     })
-
 
